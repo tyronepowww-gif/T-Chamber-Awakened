@@ -1,0 +1,2138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"
+  >
+
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>T-Chamber v2</title>
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #12161d;
+      --panel2: #181d26;
+      --line: #2b323d;
+      --text: #f2f4f7;
+      --muted: #8f98a5;
+      --accent: #ffffff;
+      --good: #9be7b0;
+      --warn: #f4d47c;
+      --danger: #f28b8b;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    button {
+      color: var(--text);
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .app {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        16px
+        max(18px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0 18px;
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      font-size: 15px;
+    }
+
+    .version {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .hero {
+      margin: 18px 0 28px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(36px, 10vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 590px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+
+    .choice {
+      min-height: 68px;
+      padding: 13px;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .choice strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .choice small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+      background: #202631;
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 58px;
+      background: var(--accent);
+      color: #080a0e;
+      border-color: var(--accent);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .secondary {
+      min-height: 46px;
+      padding: 0 18px;
+    }
+
+    .notice {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .notice strong {
+      color: var(--text);
+    }
+
+    /* TRAINING */
+
+    .training-top {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px;
+      min-width: 0;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-weight: 800;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress-wrap {
+      margin-bottom: 18px;
+    }
+
+    .progress-track {
+      height: 5px;
+      background: var(--panel2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.25s linear;
+    }
+
+    .cue-card {
+      flex: 1;
+      min-height: 390px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cue-number {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    .cue-category {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .cue-main {
+      font-size: clamp(38px, 11vw, 72px);
+      line-height: 0.95;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      margin-bottom: 20px;
+    }
+
+    .cue-detail {
+      max-width: 500px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .cue-phase {
+      margin-top: 22px;
+      color: var(--warn);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .training-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .done-button {
+      grid-column: 1 / -1;
+      min-height: 68px;
+      font-size: 18px;
+      font-weight: 900;
+      background: var(--accent);
+      color: #080a0e;
+      border-color: var(--accent);
+    }
+
+    .skip-button {
+      min-height: 50px;
+    }
+
+    .pause-button {
+      min-height: 50px;
+    }
+
+    .exit-button {
+      margin-top: 9px;
+      min-height: 44px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    /* PAUSE */
+
+    .pause-card {
+      margin: auto 0;
+      padding: 30px 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      text-align: center;
+    }
+
+    .pause-card h2 {
+      margin: 0 0 8px;
+      font-size: 34px;
+    }
+
+    .pause-card p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* RESULTS */
+
+    .results-card {
+      margin-top: 18px;
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .results-title {
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+
+    .result {
+      padding: 15px;
+      border-radius: 13px;
+      background: var(--panel2);
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .result-value {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .history {
+      margin-top: 22px;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .history-main strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .history-main small {
+      color: var(--muted);
+    }
+
+    .history-value {
+      text-align: right;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 15px 0;
+    }
+
+    .footer {
+      margin-top: auto;
+      padding-top: 18px;
+      color: #646c78;
+      font-size: 10px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (min-width: 600px) {
+      .choice-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .training-actions {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+
+      .done-button {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="header">
+    <div class="brand">T-CHAMBER</div>
+    <div class="version">V2 • INDEPENDENT ENGINE</div>
+  </header>
+
+
+  <!-- =========================================================
+       HOME
+  ========================================================== -->
+
+  <section id="homeScreen" class="screen active">
+
+    <div class="hero">
+      <h1>ENTER<br>CHAMBER.</h1>
+      <p>
+        A cue-based physical training director.
+        The Chamber tells you what to do, you perform it,
+        acknowledge completion, and receive the next cue.
+      </p>
+    </div>
+
+    <div class="notice">
+      <strong>Independent operation:</strong>
+      T-Chamber does not require a camera, motion sensor,
+      controller, Scouter, game engine, account, or wearable.
+      The software directs the session; your physical performance
+      happens outside the device.
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">Training Mode</div>
+
+      <div id="modeGrid" class="choice-grid">
+
+        <button class="choice selected" data-mode="movement">
+          <strong>Movement</strong>
+          <small>Basic directional movement</small>
+        </button>
+
+        <button class="choice" data-mode="defense">
+          <strong>Defense</strong>
+          <small>Guard, duck, evade, recover</small>
+        </button>
+
+        <button class="choice" data-mode="footwork">
+          <strong>Footwork</strong>
+          <small>Directional sequences</small>
+        </button>
+
+        <button class="choice" data-mode="conditioning">
+          <strong>Conditioning</strong>
+          <small>Timed physical actions</small>
+        </button>
+
+        <button class="choice" data-mode="reaction">
+          <strong>Reaction</strong>
+          <small>Rapid changing commands</small>
+        </button>
+
+        <button class="choice" data-mode="combo">
+          <strong>Combos</strong>
+          <small>Multi-action sequences</small>
+        </button>
+
+        <button class="choice" data-mode="free">
+          <strong>Free Chamber</strong>
+          <small>Mixed training library</small>
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="section">
+
+      <div class="section-title">Training Density</div>
+
+      <div id="densityGrid" class="choice-grid">
+
+        <button class="choice selected" data-density="1">
+          <strong>1×</strong>
+          <small>Controlled</small>
+        </button>
+
+        <button class="choice" data-density="2">
+          <strong>2×</strong>
+          <small>Steady</small>
+        </button>
+
+        <button class="choice" data-density="3">
+          <strong>3×</strong>
+          <small>Fast</small>
+        </button>
+
+        <button class="choice" data-density="5">
+          <strong>5×</strong>
+          <small>High density</small>
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="section">
+
+      <div class="section-title">Session Length</div>
+
+      <div id="durationGrid" class="choice-grid">
+
+        <button class="choice" data-duration="1">
+          <strong>1 min</strong>
+          <small>Quick test</small>
+        </button>
+
+        <button class="choice selected" data-duration="3">
+          <strong>3 min</strong>
+          <small>Short session</small>
+        </button>
+
+        <button class="choice" data-duration="5">
+          <strong>5 min</strong>
+          <small>Standard</small>
+        </button>
+
+        <button class="choice" data-duration="10">
+          <strong>10 min</strong>
+          <small>Extended</small>
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <button id="startButton" class="primary">
+      ENTER CHAMBER
+    </button>
+
+
+    <div class="footer">
+      T-Chamber is a training director, not a motion detector.
+      “DONE” means you completed the instructed action.
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       TRAINING
+  ========================================================== -->
+
+  <section id="trainingScreen" class="screen">
+
+    <div class="training-top">
+
+      <div class="stat">
+        <div class="stat-label">Time</div>
+        <div id="timeValue" class="stat-value">00:00</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Cues</div>
+        <div id="cueCountValue" class="stat-value">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Mode</div>
+        <div id="modeValue" class="stat-value">Movement</div>
+      </div>
+
+    </div>
+
+
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
+
+
+    <div class="cue-card">
+
+      <div id="cueNumber" class="cue-number">
+        CUE 01
+      </div>
+
+      <div id="cueCategory" class="cue-category">
+        MOVEMENT
+      </div>
+
+      <div id="cueMain" class="cue-main">
+        READY
+      </div>
+
+      <div id="cueDetail" class="cue-detail">
+        Prepare yourself.
+      </div>
+
+      <div id="cuePhase" class="cue-phase">
+        WAITING
+      </div>
+
+    </div>
+
+
+    <div class="training-actions">
+
+      <button id="doneButton" class="done-button">
+        DONE
+      </button>
+
+      <button id="skipButton" class="skip-button">
+        SKIP
+      </button>
+
+      <button id="pauseButton" class="pause-button">
+        PAUSE
+      </button>
+
+    </div>
+
+    <button id="exitButton" class="exit-button">
+      END SESSION
+    </button>
+
+  </section>
+
+
+  <!-- =========================================================
+       PAUSED
+  ========================================================== -->
+
+  <section id="pauseScreen" class="screen">
+
+    <div class="pause-card">
+
+      <h2>PAUSED</h2>
+
+      <p>
+        The Chamber is holding the current session.
+        Resume when you're ready.
+      </p>
+
+      <button id="resumeButton" class="primary">
+        RESUME
+      </button>
+
+      <br><br>
+
+      <button id="pauseEndButton" class="secondary">
+        END SESSION
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       RESULTS
+  ========================================================== -->
+
+  <section id="resultsScreen" class="screen">
+
+    <div class="hero">
+      <h1>SESSION<br>COMPLETE.</h1>
+      <p>
+        The Chamber has finished the training block.
+      </p>
+    </div>
+
+
+    <div class="results-card">
+
+      <div class="results-title">
+        Session Record
+      </div>
+
+      <div class="result-grid">
+
+        <div class="result">
+          <div class="result-label">Mode</div>
+          <div id="resultMode" class="result-value">Movement</div>
+        </div>
+
+        <div class="result">
+          <div class="result-label">Density</div>
+          <div id="resultDensity" class="result-value">1×</div>
+        </div>
+
+        <div class="result">
+          <div class="result-label">Duration</div>
+          <div id="resultDuration" class="result-value">3:00</div>
+        </div>
+
+        <div class="result">
+          <div class="result-label">Cues</div>
+          <div id="resultCues" class="result-value">0</div>
+        </div>
+
+        <div class="result">
+          <div class="result-label">Completed</div>
+          <div id="resultCompleted" class="result-value">0</div>
+        </div>
+
+        <div class="result">
+          <div class="result-label">Skipped</div>
+          <div id="resultSkipped" class="result-value">0</div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="section history">
+
+      <div class="section-title">
+        Local Session History
+      </div>
+
+      <div id="historyList"></div>
+
+    </div>
+
+
+    <button id="againButton" class="primary">
+      TRAIN AGAIN
+    </button>
+
+    <br>
+
+    <button id="homeButton" class="secondary">
+      RETURN HOME
+    </button>
+
+  </section>
+
+</div>
+
+
+<script>
+/* ============================================================
+   T-CHAMBER V2
+   ------------------------------------------------------------
+   Independent training director.
+
+   No:
+   - Scouter
+   - Camera
+   - Motion sensor
+   - Game engine
+   - Wearable
+   - Account
+   - External API
+
+   Core loop:
+
+       CUE
+        ↓
+       USER PERFORMS ACTION
+        ↓
+       DONE
+        ↓
+       EVALUATE ACKNOWLEDGMENT
+        ↓
+       NEXT CUE
+============================================================ */
+
+
+/* ============================================================
+   CONFIGURATION
+============================================================ */
+
+const CONFIG = {
+
+  densities: {
+
+    1: {
+      label: "1×",
+      minimumCueTime: 3500
+    },
+
+    2: {
+      label: "2×",
+      minimumCueTime: 2500
+    },
+
+    3: {
+      label: "3×",
+      minimumCueTime: 1800
+    },
+
+    5: {
+      label: "5×",
+      minimumCueTime: 1100
+    }
+
+  },
+
+  storageKey: "tChamberV2History",
+
+  maxHistory: 20
+
+};
+
+
+/* ============================================================
+   CUE LIBRARIES
+============================================================ */
+
+const LIBRARY = {
+
+  movement: [
+
+    {
+      category: "Movement",
+      main: "STEP LEFT",
+      detail: "Take one controlled step to your left.",
+      action: "left"
+    },
+
+    {
+      category: "Movement",
+      main: "STEP RIGHT",
+      detail: "Take one controlled step to your right.",
+      action: "right"
+    },
+
+    {
+      category: "Movement",
+      main: "STEP FORWARD",
+      detail: "Move forward with control.",
+      action: "forward"
+    },
+
+    {
+      category: "Movement",
+      main: "STEP BACK",
+      detail: "Move backward while maintaining your balance.",
+      action: "back"
+    },
+
+    {
+      category: "Movement",
+      main: "RESET",
+      detail: "Return to your neutral training position.",
+      action: "reset"
+    },
+
+    {
+      category: "Movement",
+      main: "BURST",
+      detail: "Perform one short explosive movement, then regain control.",
+      action: "burst"
+    }
+
+  ],
+
+
+  defense: [
+
+    {
+      category: "Defense",
+      main: "GUARD",
+      detail: "Raise and establish your guard.",
+      action: "guard"
+    },
+
+    {
+      category: "Defense",
+      main: "DUCK",
+      detail: "Drop your level and return under control.",
+      action: "duck"
+    },
+
+    {
+      category: "Defense",
+      main: "STEP LEFT",
+      detail: "Move left as your defensive response.",
+      action: "left"
+    },
+
+    {
+      category: "Defense",
+      main: "STEP RIGHT",
+      detail: "Move right as your defensive response.",
+      action: "right"
+    },
+
+    {
+      category: "Defense",
+      main: "STEP BACK",
+      detail: "Create distance with one controlled step.",
+      action: "back"
+    },
+
+    {
+      category: "Defense",
+      main: "RESET",
+      detail: "Recover to your neutral position.",
+      action: "reset"
+    }
+
+  ],
+
+
+  footwork: [
+
+    {
+      category: "Footwork",
+      main: "LEFT",
+      detail: "Step left, then immediately establish your base.",
+      action: "left"
+    },
+
+    {
+      category: "Footwork",
+      main: "RIGHT",
+      detail: "Step right, then immediately establish your base.",
+      action: "right"
+    },
+
+    {
+      category: "Footwork",
+      main: "FORWARD",
+      detail: "Advance one step without losing your base.",
+      action: "forward"
+    },
+
+    {
+      category: "Footwork",
+      main: "BACK",
+      detail: "Retreat one step without crossing your feet.",
+      action: "back"
+    },
+
+    {
+      category: "Footwork",
+      main: "LEFT → RIGHT",
+      detail: "Step left, then recover to the right.",
+      action: "sequence"
+    },
+
+    {
+      category: "Footwork",
+      main: "RIGHT → LEFT",
+      detail: "Step right, then recover to the left.",
+      action: "sequence"
+    },
+
+    {
+      category: "Footwork",
+      main: "FORWARD → BACK",
+      detail: "Advance, then immediately recover backward.",
+      action: "sequence"
+    },
+
+    {
+      category: "Footwork",
+      main: "BACK → FORWARD",
+      detail: "Retreat, then return forward.",
+      action: "sequence"
+    },
+
+    {
+      category: "Footwork",
+      main: "RESET",
+      detail: "Return to neutral and establish your base.",
+      action: "reset"
+    }
+
+  ],
+
+
+  conditioning: [
+
+    {
+      category: "Conditioning",
+      main: "SQUAT",
+      detail: "Perform controlled bodyweight squats.",
+      action: "squat"
+    },
+
+    {
+      category: "Conditioning",
+      main: "BURST",
+      detail: "Perform a short high-effort movement.",
+      action: "burst"
+    },
+
+    {
+      category: "Conditioning",
+      main: "FAST FEET",
+      detail: "Move your feet rapidly in place.",
+      action: "fastfeet"
+    },
+
+    {
+      category: "Conditioning",
+      main: "PUSH",
+      detail: "Perform controlled push-ups or your available variation.",
+      action: "push"
+    },
+
+    {
+      category: "Conditioning",
+      main: "RECOVER",
+      detail: "Stand tall, breathe, and regain control.",
+      action: "recover"
+    },
+
+    {
+      category: "Conditioning",
+      main: "RESET",
+      detail: "Return to your neutral training position.",
+      action: "reset"
+    }
+
+  ],
+
+
+  reaction: [
+
+    {
+      category: "Reaction",
+      main: "LEFT",
+      detail: "Respond immediately by moving left.",
+      action: "left"
+    },
+
+    {
+      category: "Reaction",
+      main: "RIGHT",
+      detail: "Respond immediately by moving right.",
+      action: "right"
+    },
+
+    {
+      category: "Reaction",
+      main: "FORWARD",
+      detail: "Respond immediately by moving forward.",
+      action: "forward"
+    },
+
+    {
+      category: "Reaction",
+      main: "BACK",
+      detail: "Respond immediately by moving backward.",
+      action: "back"
+    },
+
+    {
+      category: "Reaction",
+      main: "GUARD",
+      detail: "Respond immediately by establishing your guard.",
+      action: "guard"
+    },
+
+    {
+      category: "Reaction",
+      main: "DUCK",
+      detail: "Respond immediately by dropping your level.",
+      action: "duck"
+    },
+
+    {
+      category: "Reaction",
+      main: "RESET",
+      detail: "Stop and return to neutral.",
+      action: "reset"
+    }
+
+  ],
+
+
+  combo: [
+
+    {
+      category: "Combo",
+      main: "LEFT → GUARD",
+      detail: "Step left, then establish your guard.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "RIGHT → GUARD",
+      detail: "Step right, then establish your guard.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "BACK → DUCK",
+      detail: "Step backward, then drop your level.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "FORWARD → BURST",
+      detail: "Advance, then perform one short burst.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "LEFT → RIGHT → RESET",
+      detail: "Move left, move right, then recover to neutral.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "RIGHT → LEFT → RESET",
+      detail: "Move right, move left, then recover to neutral.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "GUARD → DUCK → RESET",
+      detail: "Establish guard, duck, then recover.",
+      action: "combo"
+    },
+
+    {
+      category: "Combo",
+      main: "FORWARD → BACK → RESET",
+      detail: "Advance, retreat, then establish your base.",
+      action: "combo"
+    }
+
+  ]
+
+};
+
+
+/* ============================================================
+   STATE
+============================================================ */
+
+const state = {
+
+  screen: "home",
+
+  mode: "movement",
+
+  density: 1,
+
+  durationMinutes: 3,
+
+  running: false,
+
+  paused: false,
+
+  sessionStart: null,
+
+  pausedAt: null,
+
+  accumulatedPause: 0,
+
+  elapsed: 0,
+
+  cueNumber: 0,
+
+  completed: 0,
+
+  skipped: 0,
+
+  currentCue: null,
+
+  cueStartedAt: null,
+
+  nextCueTimer: null,
+
+  clockTimer: null,
+
+  history: []
+
+};
+
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const $ = id => document.getElementById(id);
+
+const screens = {
+
+  home: $("homeScreen"),
+
+  training: $("trainingScreen"),
+
+  pause: $("pauseScreen"),
+
+  results: $("resultsScreen")
+
+};
+
+
+/* ============================================================
+   SCREEN CONTROL
+============================================================ */
+
+function showScreen(name) {
+
+  Object.values(screens).forEach(screen => {
+    screen.classList.remove("active");
+  });
+
+  screens[name].classList.add("active");
+
+  state.screen = name;
+
+}
+
+
+/* ============================================================
+   HOME SELECTION
+============================================================ */
+
+document
+  .querySelectorAll("#modeGrid .choice")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      document
+        .querySelectorAll("#modeGrid .choice")
+        .forEach(b => b.classList.remove("selected"));
+
+      button.classList.add("selected");
+
+      state.mode = button.dataset.mode;
+
+    });
+
+  });
+
+
+document
+  .querySelectorAll("#densityGrid .choice")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      document
+        .querySelectorAll("#densityGrid .choice")
+        .forEach(b => b.classList.remove("selected"));
+
+      button.classList.add("selected");
+
+      state.density = Number(button.dataset.density);
+
+    });
+
+  });
+
+
+document
+  .querySelectorAll("#durationGrid .choice")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      document
+        .querySelectorAll("#durationGrid .choice")
+        .forEach(b => b.classList.remove("selected"));
+
+      button.classList.add("selected");
+
+      state.durationMinutes = Number(button.dataset.duration);
+
+    });
+
+  });
+
+
+/* ============================================================
+   MODE LABEL
+============================================================ */
+
+function modeLabel(mode) {
+
+  const labels = {
+
+    movement: "Movement",
+    defense: "Defense",
+    footwork: "Footwork",
+    conditioning: "Conditioning",
+    reaction: "Reaction",
+    combo: "Combos",
+    free: "Free Chamber"
+
+  };
+
+  return labels[mode] || mode;
+
+}
+
+
+/* ============================================================
+   BUILD CUE POOL
+============================================================ */
+
+function getCuePool() {
+
+  if (state.mode === "free") {
+
+    return [
+
+      ...LIBRARY.movement,
+      ...LIBRARY.defense,
+      ...LIBRARY.footwork,
+      ...LIBRARY.conditioning,
+      ...LIBRARY.reaction,
+      ...LIBRARY.combo
+
+    ];
+
+  }
+
+  return LIBRARY[state.mode] || LIBRARY.movement;
+
+}
+
+
+/* ============================================================
+   RANDOM CUE
+============================================================ */
+
+function chooseCue() {
+
+  const pool = getCuePool();
+
+  if (!pool.length) {
+    return LIBRARY.movement[0];
+  }
+
+  let cue;
+
+  let attempts = 0;
+
+  do {
+
+    cue = pool[Math.floor(Math.random() * pool.length)];
+
+    attempts++;
+
+  } while (
+
+    state.currentCue &&
+    cue.main === state.currentCue.main &&
+    pool.length > 1 &&
+    attempts < 10
+
+  );
+
+  return { ...cue };
+
+}
+
+
+/* ============================================================
+   SESSION START
+============================================================ */
+
+$("startButton").addEventListener("click", startSession);
+
+
+function startSession() {
+
+  clearTimers();
+
+  state.running = true;
+  state.paused = false;
+
+  state.sessionStart = Date.now();
+  state.pausedAt = null;
+  state.accumulatedPause = 0;
+
+  state.elapsed = 0;
+  state.cueNumber = 0;
+  state.completed = 0;
+  state.skipped = 0;
+  state.currentCue = null;
+  state.cueStartedAt = null;
+
+  $("modeValue").textContent = modeLabel(state.mode);
+
+  showScreen("training");
+
+  updateTrainingUI();
+
+  nextCue();
+
+  state.clockTimer = setInterval(updateClock, 100);
+
+}
+
+
+/* ============================================================
+   NEXT CUE
+============================================================ */
+
+function nextCue() {
+
+  if (!state.running || state.paused) return;
+
+  if (sessionFinished()) {
+
+    finishSession();
+
+    return;
+
+  }
+
+  clearTimeout(state.nextCueTimer);
+
+  state.currentCue = chooseCue();
+
+  state.cueNumber++;
+
+  state.cueStartedAt = Date.now();
+
+  renderCue();
+
+}
+
+
+/* ============================================================
+   RENDER CUE
+============================================================ */
+
+function renderCue() {
+
+  const cue = state.currentCue;
+
+  $("cueNumber").textContent =
+    "CUE " + String(state.cueNumber).padStart(2, "0");
+
+  $("cueCategory").textContent =
+    cue.category;
+
+  $("cueMain").textContent =
+    cue.main;
+
+  $("cueDetail").textContent =
+    cue.detail;
+
+  $("cuePhase").textContent =
+    "PERFORM → THEN PRESS DONE";
+
+  updateTrainingUI();
+
+}
+
+
+/* ============================================================
+   DONE
+============================================================ */
+
+$("doneButton").addEventListener("click", completeCue);
+
+
+function completeCue() {
+
+  if (!state.running || state.paused || !state.currentCue) {
+    return;
+  }
+
+  state.completed++;
+
+  flashPhase("COMPLETED");
+
+  scheduleNextCue();
+
+}
+
+
+/* ============================================================
+   SKIP
+============================================================ */
+
+$("skipButton").addEventListener("click", skipCue);
+
+
+function skipCue() {
+
+  if (!state.running || state.paused || !state.currentCue) {
+    return;
+  }
+
+  state.skipped++;
+
+  flashPhase("SKIPPED");
+
+  scheduleNextCue();
+
+}
+
+
+/* ============================================================
+   NEXT CUE SCHEDULING
+============================================================ */
+
+function scheduleNextCue() {
+
+  clearTimeout(state.nextCueTimer);
+
+  /*
+    The timer is intentionally short.
+
+    T-Chamber does NOT judge physical performance.
+    The user controls when the action is acknowledged.
+    Density determines the transition speed between cues.
+  */
+
+  const transition = Math.max(
+    350,
+    CONFIG.densities[state.density].minimumCueTime * 0.12
+  );
+
+  state.nextCueTimer = setTimeout(() => {
+
+    nextCue();
+
+  }, transition);
+
+}
+
+
+/* ============================================================
+   PHASE MESSAGE
+============================================================ */
+
+function flashPhase(text) {
+
+  $("cuePhase").textContent = text;
+
+}
+
+
+/* ============================================================
+   PAUSE
+============================================================ */
+
+$("pauseButton").addEventListener("click", pauseSession);
+
+
+function pauseSession() {
+
+  if (!state.running || state.paused) {
+    return;
+  }
+
+  state.paused = true;
+
+  state.pausedAt = Date.now();
+
+  clearTimeout(state.nextCueTimer);
+
+  $("pauseButton").textContent = "PAUSED";
+
+  showScreen("pause");
+
+}
+
+
+/* ============================================================
+   RESUME
+============================================================ */
+
+$("resumeButton").addEventListener("click", resumeSession);
+
+
+function resumeSession() {
+
+  if (!state.running || !state.paused) {
+    return;
+  }
+
+  state.accumulatedPause +=
+    Date.now() - state.pausedAt;
+
+  state.pausedAt = null;
+  state.paused = false;
+
+  $("pauseButton").textContent = "PAUSE";
+
+  showScreen("training");
+
+  renderCue();
+
+  updateClock();
+
+}
+
+
+/* ============================================================
+   END BUTTONS
+============================================================ */
+
+$("exitButton").addEventListener("click", () => {
+
+  if (!state.running) return;
+
+  finishSession();
+
+});
+
+
+$("pauseEndButton").addEventListener("click", () => {
+
+  if (!state.running) return;
+
+  finishSession();
+
+});
+
+
+/* ============================================================
+   SESSION TIMING
+============================================================ */
+
+function getElapsedMilliseconds() {
+
+  if (!state.sessionStart) {
+    return 0;
+  }
+
+  const now = state.paused
+    ? state.pausedAt
+    : Date.now();
+
+  return Math.max(
+    0,
+    now -
+    state.sessionStart -
+    state.accumulatedPause
+  );
+
+}
+
+
+function updateClock() {
+
+  if (!state.running) return;
+
+  state.elapsed =
+    getElapsedMilliseconds();
+
+  const total =
+    state.durationMinutes * 60 * 1000;
+
+  const remaining =
+    Math.max(0, total - state.elapsed);
+
+  $("timeValue").textContent =
+    formatTime(remaining);
+
+  const progress =
+    Math.min(100, (state.elapsed / total) * 100);
+
+  $("progressBar").style.width =
+    progress + "%";
+
+  if (remaining <= 0) {
+
+    finishSession();
+
+  }
+
+}
+
+
+function sessionFinished() {
+
+  return getElapsedMilliseconds() >=
+    state.durationMinutes * 60 * 1000;
+
+}
+
+
+/* ============================================================
+   FORMAT TIME
+============================================================ */
+
+function formatTime(milliseconds) {
+
+  const totalSeconds =
+    Math.max(0, Math.ceil(milliseconds / 1000));
+
+  const minutes =
+    Math.floor(totalSeconds / 60);
+
+  const seconds =
+    totalSeconds % 60;
+
+  return (
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(seconds).padStart(2, "0")
+  );
+
+}
+
+
+/* ============================================================
+   TRAINING UI
+============================================================ */
+
+function updateTrainingUI() {
+
+  $("cueCountValue").textContent =
+    state.cueNumber;
+
+  $("modeValue").textContent =
+    modeLabel(state.mode);
+
+}
+
+
+/* ============================================================
+   CLEAR TIMERS
+============================================================ */
+
+function clearTimers() {
+
+  if (state.nextCueTimer) {
+
+    clearTimeout(state.nextCueTimer);
+
+    state.nextCueTimer = null;
+
+  }
+
+  if (state.clockTimer) {
+
+    clearInterval(state.clockTimer);
+
+    state.clockTimer = null;
+
+  }
+
+}
+
+
+/* ============================================================
+   FINISH SESSION
+============================================================ */
+
+function finishSession() {
+
+  if (!state.running) {
+    return;
+  }
+
+  state.elapsed =
+    getElapsedMilliseconds();
+
+  state.running = false;
+  state.paused = false;
+
+  clearTimers();
+
+  saveSession();
+
+  renderResults();
+
+  showScreen("results");
+
+}
+
+
+/* ============================================================
+   LOCAL STORAGE
+============================================================ */
+
+function loadHistory() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(CONFIG.storageKey);
+
+    if (!saved) {
+      state.history = [];
+      return;
+    }
+
+    const parsed =
+      JSON.parse(saved);
+
+    state.history =
+      Array.isArray(parsed)
+        ? parsed
+        : [];
+
+  } catch (error) {
+
+    state.history = [];
+
+  }
+
+}
+
+
+function saveSession() {
+
+  const record = {
+
+    date: new Date().toISOString(),
+
+    mode: state.mode,
+
+    density: state.density,
+
+    durationMinutes:
+      state.durationMinutes,
+
+    cues:
+      state.cueNumber,
+
+    completed:
+      state.completed,
+
+    skipped:
+      state.skipped
+
+  };
+
+  state.history.unshift(record);
+
+  state.history =
+    state.history.slice(
+      0,
+      CONFIG.maxHistory
+    );
+
+  try {
+
+    localStorage.setItem(
+      CONFIG.storageKey,
+      JSON.stringify(state.history)
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "T-Chamber could not save local history.",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   RESULTS
+============================================================ */
+
+function renderResults() {
+
+  $("resultMode").textContent =
+    modeLabel(state.mode);
+
+  $("resultDensity").textContent =
+    CONFIG.densities[state.density].label;
+
+  $("resultDuration").textContent =
+    formatTime(state.elapsed);
+
+  $("resultCues").textContent =
+    state.cueNumber;
+
+  $("resultCompleted").textContent =
+    state.completed;
+
+  $("resultSkipped").textContent =
+    state.skipped;
+
+  renderHistory();
+
+}
+
+
+function renderHistory() {
+
+  const list =
+    $("historyList");
+
+  if (!state.history.length) {
+
+    list.innerHTML =
+      '<div class="empty">No previous sessions.</div>';
+
+    return;
+
+  }
+
+  list.innerHTML = "";
+
+  state.history.forEach(record => {
+
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "history-row";
+
+    const date =
+      new Date(record.date);
+
+    const dateText =
+      date.toLocaleDateString(
+        undefined,
+        {
+          month: "short",
+          day: "numeric"
+        }
+      );
+
+    const timeText =
+      date.toLocaleTimeString(
+        undefined,
+        {
+          hour: "numeric",
+          minute: "2-digit"
+        }
+      );
+
+    row.innerHTML = `
+
+      <div class="history-main">
+        <strong>${escapeHTML(modeLabel(record.mode))}</strong>
+        <small>
+          ${escapeHTML(dateText)} •
+          ${escapeHTML(timeText)} •
+          ${escapeHTML(CONFIG.densities[record.density]?.label || record.density + "×")}
+        </small>
+      </div>
+
+      <div class="history-value">
+        ${record.completed} done
+      </div>
+
+      <div class="history-value">
+        ${record.cues} cues
+      </div>
+
+    `;
+
+    list.appendChild(row);
+
+  });
+
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/* ============================================================
+   TRAIN AGAIN
+============================================================ */
+
+$("againButton").addEventListener("click", () => {
+
+  startSession();
+
+});
+
+
+/* ============================================================
+   RETURN HOME
+============================================================ */
+
+$("homeButton").addEventListener("click", () => {
+
+  clearTimers();
+
+  state.running = false;
+  state.paused = false;
+
+  showScreen("home");
+
+});
+
+
+/* ============================================================
+   KEYBOARD TESTING
+   ------------------------------------------------------------
+   These are NOT sensors.
+
+   They simply allow the developer/user to test the
+   acknowledgment pathway on a computer.
+============================================================ */
+
+document.addEventListener("keydown", event => {
+
+  if (state.screen !== "training") {
+    return;
+  }
+
+  if (event.repeat) {
+    return;
+  }
+
+  const key =
+    event.key.toLowerCase();
+
+  /*
+    Space / Enter = DONE
+  */
+
+  if (
+    key === " " ||
+    key === "enter"
+  ) {
+
+    event.preventDefault();
+
+    completeCue();
+
+  }
+
+});
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+loadHistory();
+
+renderHistory();
+
+</script>
+
+</body>
+</html>
